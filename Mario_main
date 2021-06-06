@@ -1,0 +1,127 @@
+float angle;
+float turnSpeed;
+
+float moveSpeed;
+
+float playerX;
+float playerY;
+
+float timer;
+int score;
+
+String gameState;
+
+float[] badX = new float[15];
+float[] badY = new float[15];
+float[] speedY = new float[15];
+
+PImage mar;
+PImage coin;
+PImage bow;
+PImage town;
+
+Bullet shot;
+
+void setup() {
+  size(500, 600);
+  
+  mar = loadImage("mario.png");
+  coin = loadImage("coin.png");
+  bow = loadImage("bowser.png");
+  town = loadImage("mariotown.jpeg");
+  
+  gameState = "game";
+
+  angle = 0;
+  turnSpeed = .2;
+  moveSpeed = 5;
+  
+  playerX = width/2;
+  playerY = height - 50;
+
+  for (int i=0; i<15; i++) {
+    badX[i] = random(width);
+    badY[i] = random(height);
+    speedY[i] = 1.5;
+  }
+
+  shot = new Bullet();
+  shot.reset(-1000, -1000, 0);
+
+  timer = 1200;
+  score = 0;
+}
+
+void draw() {
+  background(0);
+  imageMode(CENTER);
+  image(town, 250, 100);
+  
+  float coinDist = 25;
+  float coinX = playerX + cos(angle) * coinDist;
+  float coinY = playerY + sin(angle) * coinDist;
+  
+  fill(255);
+  imageMode(CENTER);
+  image(mar, playerX, playerY, 55, 55);
+  image(coin, coinX, coinY, 15, 15);
+
+  for (int i=0; i<15; i++) {
+    badY[i] += speedY[i];
+    image(bow, badX[i], badY[i], 45, 45);
+    if (badY[i] >= height - 80) {
+      badY[i] = -10;
+      badX[i] = (random(0, 500));
+    }
+    float distance = dist(badX[i], badY[i], shot.x, shot.y);
+    if (distance < shot.size/2 + 20/2) {
+      speedY[i] = -10000;
+      score += 50;
+    }
+  }
+
+  shot.drawBullet();
+
+  timer --;
+  float boxWidth = timer * 0.2;
+  rect(20, 20, boxWidth, 20);
+  
+  text("Time: "+timer, 20, 60);
+  
+  if (timer <= 0){ 
+   timer = 0;
+   gameState = "gameOver";
+  }
+  fill(0);
+  text("Score: "+score, 400, 60);
+  textSize(19);
+  
+  if (gameState == "gameOver"){
+   background(255);
+   textSize(50);
+   textAlign(CENTER);
+   fill(255, 0, 0);
+   text("GAME OVER", width/2, height/2);
+   fill(0, 0, 255);
+   text("FINAL SCORE: "+ score, 250, 360);
+   
+  }
+}
+
+void keyPressed() {
+  if (keyCode == LEFT) {
+    angle -= turnSpeed;
+  }
+  if (keyCode == RIGHT) {
+    angle += turnSpeed;
+  }
+
+  if (keyCode == UP) {
+    playerX += cos(angle) * moveSpeed;
+    playerY += sin(angle) * moveSpeed;
+  }
+
+  if (key == ' ') {
+    shot.reset(playerX, playerY, angle);
+  }
+}
