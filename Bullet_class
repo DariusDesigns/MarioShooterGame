@@ -1,0 +1,27 @@
+class Bullet{
+  
+  float x;
+  float y;
+  
+  float speed;
+  float angle;
+  
+  float size;
+  
+  void reset(float startX, float startY, float startAngle){
+   x = startX;
+   y = startY;
+   angle = startAngle;
+   
+   speed = 10;
+   size = 15;
+  }
+  
+  void drawBullet(){
+   x += cos(angle) * speed;
+   y += sin(angle) * speed;
+   
+   image(coin, x, y, size, size);
+  }
+  
+}
